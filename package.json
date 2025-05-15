@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
-    "test:unit": "vitest",
+    "test": "vitest",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
@@ -23,7 +23,8 @@
     "reka-ui": "^2.2.1",
     "tailwind-merge": "^3.3.0",
     "vue": "^3.5.13",
-    "yaml": "^2.7.1"
+    "yaml": "^2.7.1",
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
