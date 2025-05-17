@@ -58,4 +58,21 @@ describe("matrixInterpreter", () => {
 
     expect(result).toStrictEqual(expected)
   })
+  test("3 Dimensional matrix, with 2 2 2 elements", () => {
+    const matrix: Matrix = {
+      matrix: {
+        animal: ["cat", "dog"],
+        color: ["red", "green"],
+        other: ["one", "two"]
+      },
+      exclude: [
+        { animal: "cat", color: "red" }
+      ]
+    }
+    const expected = [{ animal: "dog", color: "red", other: "one" }, { animal: "cat", color: "green", other: "one" }, { animal: "dog", color: "green", other: "one" }, { animal: "dog", color: "red", other: "two" }, { animal: "cat", color: "green", other: "two" }, { animal: "dog", color: "green", other: "two" }]
+
+    const result = interpretMatrix(matrix)
+
+    expect(result).toStrictEqual(expected)
+  })
 })

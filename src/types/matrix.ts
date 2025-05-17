@@ -2,8 +2,8 @@ import { z } from "zod"
 
 export type Matrix = {
   matrix: MatrixEntry,
-  include?: MatrixEntry[],
-  exclude?: MatrixEntry[],
+  include?: Record<string, string>[],
+  exclude?: Record<string, string>[],
 }
 
 export type MatrixEntry = {

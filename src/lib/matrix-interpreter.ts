@@ -1,13 +1,24 @@
 import { type Matrix, type MatrixEntry } from "@/types/matrix";
 
 export function interpretMatrix(m: Matrix) {
+  const exclusions = m.exclude
   const result = []
 
   for (const v of newGenMatrix(m.matrix)) {
+    if (exclusions !== undefined && matchExclusion(v, exclusions)) continue
+
     result.push(v)
   }
 
   return result
+}
+
+function matchExclusion(v: Record<string, string>, exclusions: Record<string, string>[]) {
+  for (const exclude of exclusions) {
+    const matches = Object.entries(exclude).every(([key, value]) => v[key] === value)
+    if (matches) return true
+  }
+  return false
 }
 
 function* newGenMatrix(m: MatrixEntry) {
