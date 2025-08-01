@@ -1,14 +1,34 @@
 <script setup lang="ts">
-import { useForm } from 'vee-validate'
+import { useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
-import { Textarea } from '@/components/ui/textarea'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import { parse } from 'yaml'
+import { load, YAMLException } from 'js-yaml'
 import type { Matrix } from '@/types/matrix'
 import { useMatrix } from '@/stores/useMatrix'
+import { Codemirror } from 'vue-codemirror'
+import { yamlLanguage } from '@codemirror/lang-yaml'
+import { linter, type Diagnostic } from '@codemirror/lint'
+import { oneDark } from '@codemirror/theme-one-dark'
 
+const lintYaml = linter((view) => {
+  const diagnostics: Diagnostic[] = []
+  try {
+    load(view.state.doc.toString())
+  } catch (error) {
+    if (error instanceof YAMLException) {
+      console.log(error)
+      const loc = error.mark
+      const from = loc ? loc.position : 0
+      const to = from
+      const severity = 'error'
+      diagnostics.push({ from: from, to: to, message: error.message, severity: severity })
+    }
+  }
+  return diagnostics
+})
+
+const extensions = [yamlLanguage.extension, lintYaml, oneDark]
 const initialRawMatrix = `
 strategy:
   matrix:
@@ -26,24 +46,27 @@ const strategySchema = z.object({
     matrix: z.any(),
   }),
 })
-const formSchema = toTypedSchema(
-  z.object({
-    rawInput: z.string(),
-  }),
-)
+
+const formSchema = z.string().refine((val) => {
+  try {
+    load(val)
+    return true
+  } catch (error) {
+    console.log(error)
+    return false
+  }
+}, 'invalid yaml')
 
 const matrixStore = useMatrix()
 
-const form = useForm({
-  validationSchema: formSchema,
-  initialValues: {
-    rawInput: initialRawMatrix,
-  },
+const { value: matrixInput, errorMessage } = useField('rawInput', toTypedSchema(formSchema), {
+  syncVModel: true,
+  initialValue: initialRawMatrix,
 })
 
-const onSubmit = form.handleSubmit((values) => {
-  console.log('Form submitted!', values)
-  const val = parse(values.rawInput)
+const onSubmit = () => {
+  console.log('Form submitted!', matrixInput.value)
+  const val = load(matrixInput.value)
   const { strategy } = strategySchema.parse(val)
   const { include, exclude, ...m } = strategy.matrix
   const matrix: Matrix = {
@@ -54,19 +77,14 @@ const onSubmit = form.handleSubmit((values) => {
 
   console.log(matrix)
   matrixStore.setMatrix(matrix)
-})
+}
 </script>
+
 <template>
-  <form @submit="onSubmit">
-    <FormField v-slot="{ componentField }" name="rawInput">
-      <FormItem>
-        <FormLabel>Raw Input</FormLabel>
-        <FormControl>
-          <Textarea type="text" placeholder="yaml" v-bind="componentField" rows="20" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    </FormField>
-    <Button class="mt-2" type="submit">Generate Matrix</Button>
+  <form @submit.prevent="onSubmit">
+    <codemirror v-model="matrixInput" :extensions="extensions" />
+    <Button class="mt-4" type="submit" :disabled="errorMessage !== undefined"
+      >Generate Matrix</Button
+    >
   </form>
 </template>

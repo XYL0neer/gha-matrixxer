@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MatrixSimpleForm from './components/MatrixSimpleForm.vue'
+import MatrixForm from './components/MatrixForm.vue'
 import MatrixVisualizer from './components/MatrixVisualizer.vue'
 </script>
 
@@ -10,7 +10,7 @@ import MatrixVisualizer from './components/MatrixVisualizer.vue'
 
   <main>
     <section class="mx-auto mb-8 container">
-      <MatrixSimpleForm />
+      <MatrixForm />
     </section>
 
     <section class="mx-auto container">
