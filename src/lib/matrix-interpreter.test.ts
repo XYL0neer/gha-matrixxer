@@ -12,12 +12,30 @@ describe('Matrix examples from official docs https://docs.github.com/en/actions/
     }
 
     const expected = [
-      { version: 10, os: 'ubuntu-latest' },
-      { version: 10, os: 'windows-latest' },
-      { version: 12, os: 'ubuntu-latest' },
-      { version: 12, os: 'windows-latest' },
-      { version: 14, os: 'ubuntu-latest' },
-      { version: 14, os: 'windows-latest' },
+      [
+        { value: 10, from: 'matrix', key: 'version', index: 0 },
+        { value: 'ubuntu-latest', from: 'matrix', key: 'os', index: 0 },
+      ],
+      [
+        { value: 10, from: 'matrix', key: 'version', index: 0 },
+        { value: 'windows-latest', from: 'matrix', key: 'os', index: 1 },
+      ],
+      [
+        { value: 12, from: 'matrix', key: 'version', index: 1 },
+        { value: 'ubuntu-latest', from: 'matrix', key: 'os', index: 0 },
+      ],
+      [
+        { value: 12, from: 'matrix', key: 'version', index: 1 },
+        { value: 'windows-latest', from: 'matrix', key: 'os', index: 1 },
+      ],
+      [
+        { value: 14, from: 'matrix', key: 'version', index: 2 },
+        { value: 'ubuntu-latest', from: 'matrix', key: 'os', index: 0 },
+      ],
+      [
+        { value: 14, from: 'matrix', key: 'version', index: 2 },
+        { value: 'windows-latest', from: 'matrix', key: 'os', index: 1 },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -31,7 +49,11 @@ describe('Matrix examples from official docs https://docs.github.com/en/actions/
       },
     }
 
-    const expected = [{ version: 10 }, { version: 12 }, { version: 14 }]
+    const expected = [
+      [{ value: 10, key: 'version', index: 0, from: 'matrix' }],
+      [{ value: 12, key: 'version', index: 1, from: 'matrix' }],
+      [{ value: 14, key: 'version', index: 2, from: 'matrix' }],
+    ]
 
     const result = interpretMatrix(matrix)
 
@@ -46,12 +68,30 @@ describe('Matrix examples from official docs https://docs.github.com/en/actions/
     }
 
     const expected = [
-      { os: 'ubuntu-22.04', version: 10 },
-      { os: 'ubuntu-22.04', version: 12 },
-      { os: 'ubuntu-22.04', version: 14 },
-      { os: 'ubuntu-20.04', version: 10 },
-      { os: 'ubuntu-20.04', version: 12 },
-      { os: 'ubuntu-20.04', version: 14 },
+      [
+        { value: 'ubuntu-22.04', key: 'os', index: 0, from: 'matrix' },
+        { value: 10, key: 'version', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-22.04', key: 'os', index: 0, from: 'matrix' },
+        { value: 12, key: 'version', index: 1, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-22.04', key: 'os', index: 0, from: 'matrix' },
+        { value: 14, key: 'version', index: 2, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-20.04', key: 'os', index: 1, from: 'matrix' },
+        { value: 10, key: 'version', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-20.04', key: 'os', index: 1, from: 'matrix' },
+        { value: 12, key: 'version', index: 1, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-20.04', key: 'os', index: 1, from: 'matrix' },
+        { value: 14, key: 'version', index: 2, from: 'matrix' },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -67,10 +107,32 @@ describe('Matrix examples from official docs https://docs.github.com/en/actions/
     }
 
     const expected = [
-      { os: 'ubuntu-latest', node: { version: 14 } },
-      { os: 'ubuntu-latest', node: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' } },
-      { os: 'macos-latest', node: { version: 14 } },
-      { os: 'macos-latest', node: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' } },
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: { version: 14 }, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 0, from: 'matrix' },
+        {
+          value: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
+          key: 'node',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: { version: 14 }, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 1, from: 'matrix' },
+        {
+          value: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
+          key: 'node',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -92,14 +154,36 @@ describe('Matrix examples from official docs https://docs.github.com/en/actions/
         { fruit: 'banana', animal: 'cat' },
       ],
     }
-
     const expected = [
-      { fruit: 'apple', animal: 'cat', color: 'pink', shape: 'circle' },
-      { fruit: 'apple', animal: 'dog', color: 'green', shape: 'circle' },
-      { fruit: 'pear', animal: 'cat', color: 'pink' },
-      { fruit: 'pear', animal: 'dog', color: 'green' },
-      { fruit: 'banana' },
-      { fruit: 'banana', animal: 'cat' },
+      [
+        { value: 'apple', key: 'fruit', index: 0, from: 'matrix' },
+        { value: 'cat', key: 'animal', index: 0, from: 'matrix' },
+        { value: 'green', key: 'color', index: 0, from: 'include' },
+        { value: 'pink', key: 'color', index: 1, from: 'include' },
+        { value: 'circle', key: 'shape', index: 2, from: 'include' },
+      ],
+      [
+        { value: 'apple', key: 'fruit', index: 0, from: 'matrix' },
+        { value: 'dog', key: 'animal', index: 1, from: 'matrix' },
+        { value: 'green', key: 'color', index: 0, from: 'include' },
+        { value: 'circle', key: 'shape', index: 2, from: 'include' },
+      ],
+      [
+        { value: 'pear', key: 'fruit', index: 1, from: 'matrix' },
+        { value: 'cat', key: 'animal', index: 0, from: 'matrix' },
+        { value: 'green', key: 'color', index: 0, from: 'include' },
+        { value: 'pink', key: 'color', index: 1, from: 'include' },
+      ],
+      [
+        { value: 'pear', key: 'fruit', index: 1, from: 'matrix' },
+        { value: 'dog', key: 'animal', index: 1, from: 'matrix' },
+        { value: 'green', key: 'color', index: 0, from: 'include' },
+      ],
+      [{ value: 'banana', key: 'fruit', index: 3, from: 'include' }],
+      [
+        { value: 'banana', key: 'fruit', index: 4, from: 'include' },
+        { value: 'cat', key: 'animal', index: 4, from: 'include' },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -116,10 +200,23 @@ describe('Matrix examples from official docs https://docs.github.com/en/actions/
     }
 
     const expected = [
-      { os: 'windows-latest', node: 14 },
-      { os: 'windows-latest', node: 16, npm: 6 },
-      { os: 'ubuntu-latest', node: 14 },
-      { os: 'ubuntu-latest', node: 16 },
+      [
+        { value: 'windows-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 14, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'windows-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 16, key: 'node', index: 1, from: 'matrix' },
+        { value: 6, key: 'npm', index: 0, from: 'include' },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: 14, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: 16, key: 'node', index: 1, from: 'matrix' },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -136,16 +233,46 @@ describe('Matrix examples from official docs https://docs.github.com/en/actions/
     }
 
     const expected = [
-      { os: 'macos-latest', version: 12 },
-      { os: 'macos-latest', version: 14 },
-      { os: 'macos-latest', version: 16 },
-      { os: 'windows-latest', version: 12 },
-      { os: 'windows-latest', version: 14 },
-      { os: 'windows-latest', version: 16 },
-      { os: 'ubuntu-latest', version: 12 },
-      { os: 'ubuntu-latest', version: 14 },
-      { os: 'ubuntu-latest', version: 16 },
-      { os: 'windows-latest', version: 17 },
+      [
+        { value: 'macos-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 12, key: 'version', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 14, key: 'version', index: 1, from: 'matrix' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 16, key: 'version', index: 2, from: 'matrix' },
+      ],
+      [
+        { value: 'windows-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: 12, key: 'version', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'windows-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: 14, key: 'version', index: 1, from: 'matrix' },
+      ],
+      [
+        { value: 'windows-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: 16, key: 'version', index: 2, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 2, from: 'matrix' },
+        { value: 12, key: 'version', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 2, from: 'matrix' },
+        { value: 14, key: 'version', index: 1, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 2, from: 'matrix' },
+        { value: 16, key: 'version', index: 2, from: 'matrix' },
+      ],
+      [
+        { value: 'windows-latest', key: 'os', index: 0, from: 'include' },
+        { value: 17, key: 'version', index: 0, from: 'include' },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -162,8 +289,14 @@ describe('Matrix examples from official docs https://docs.github.com/en/actions/
     }
 
     const expected = [
-      { site: 'production', datacenter: 'site-a' },
-      { site: 'staging', datacenter: 'site-b' },
+      [
+        { value: 'production', key: 'site', index: 0, from: 'include' },
+        { value: 'site-a', key: 'datacenter', index: 0, from: 'include' },
+      ],
+      [
+        { value: 'staging', key: 'site', index: 1, from: 'include' },
+        { value: 'site-b', key: 'datacenter', index: 1, from: 'include' },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -182,17 +315,134 @@ describe('Matrix examples from official docs https://docs.github.com/en/actions/
         { os: 'windows-latest', version: 16 },
       ],
     }
-
     const expected = [
-      { os: 'macos-latest', version: 12, environment: 'staging' },
-      { os: 'macos-latest', version: 12, environment: 'production' },
-      { os: 'macos-latest', version: 14, environment: 'staging' },
-      { os: 'macos-latest', version: 14, environment: 'production' },
-      { os: 'macos-latest', version: 16, environment: 'staging' },
-      { os: 'macos-latest', version: 16, environment: 'production' },
-      { os: 'windows-latest', version: 12, environment: 'staging' },
-      { os: 'windows-latest', version: 14, environment: 'staging' },
-      { os: 'windows-latest', version: 14, environment: 'production' },
+      [
+        { value: 'macos-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 12, key: 'version', index: 0, from: 'matrix' },
+        { value: 'staging', key: 'environment', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 12, key: 'version', index: 0, from: 'matrix' },
+        {
+          value: 'production',
+          key: 'environment',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 14, key: 'version', index: 1, from: 'matrix' },
+        { value: 'staging', key: 'environment', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 14, key: 'version', index: 1, from: 'matrix' },
+        {
+          value: 'production',
+          key: 'environment',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 16, key: 'version', index: 2, from: 'matrix' },
+        { value: 'staging', key: 'environment', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: 16, key: 'version', index: 2, from: 'matrix' },
+        {
+          value: 'production',
+          key: 'environment',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
+      [
+        { value: 'windows-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: 12, key: 'version', index: 0, from: 'matrix' },
+        { value: 'staging', key: 'environment', index: 0, from: 'matrix' },
+      ],
+      [
+        {
+          value: 'windows-latest',
+          key: 'os',
+          index: 1,
+          from: 'matrix',
+          isExcluded: true,
+        },
+        {
+          value: 12,
+          key: 'version',
+          index: 0,
+          from: 'matrix',
+          isExcluded: true,
+        },
+        {
+          value: 'production',
+          key: 'environment',
+          index: 1,
+          from: 'matrix',
+          isExcluded: true,
+        },
+      ],
+      [
+        { value: 'windows-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: 14, key: 'version', index: 1, from: 'matrix' },
+        { value: 'staging', key: 'environment', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'windows-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: 14, key: 'version', index: 1, from: 'matrix' },
+        {
+          value: 'production',
+          key: 'environment',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
+      [
+        {
+          value: 'windows-latest',
+          key: 'os',
+          index: 1,
+          from: 'matrix',
+          isExcluded: true,
+        },
+        {
+          value: 16,
+          key: 'version',
+          index: 2,
+          from: 'matrix',
+          isExcluded: true,
+        },
+        { value: 'staging', key: 'environment', index: 0, from: 'matrix' },
+      ],
+      [
+        {
+          value: 'windows-latest',
+          key: 'os',
+          index: 1,
+          from: 'matrix',
+          isExcluded: true,
+        },
+        {
+          value: 16,
+          key: 'version',
+          index: 2,
+          from: 'matrix',
+          isExcluded: true,
+        },
+        {
+          value: 'production',
+          key: 'environment',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -218,14 +468,33 @@ describe('Additional edge cases', () => {
     }
 
     const expected = [
-      { os: 'ubuntu-latest', node: { version: 14 } },
-      {
-        os: 'ubuntu-latest',
-        node: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
-        shell: 'bash',
-      },
-      { os: 'macos-latest', node: { version: 14 } },
-      { os: 'macos-latest', node: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' } },
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: { version: 14 }, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 0, from: 'matrix' },
+        {
+          value: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
+          key: 'node',
+          index: 1,
+          from: 'matrix',
+        },
+        { value: 'bash', key: 'shell', index: 0, from: 'include' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: { version: 14 }, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 1, from: 'matrix' },
+        {
+          value: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
+          key: 'node',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -247,11 +516,41 @@ describe('Additional edge cases', () => {
     }
 
     const expected = [
-      { os: 'ubuntu-latest', node: { version: 14 } },
-      { os: 'ubuntu-latest', node: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' } },
-      { os: 'macos-latest', node: { version: 14 } },
-      { os: 'macos-latest', node: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' } },
-      { os: 'ubuntu-latest', node: { version: 18, env: 'NODE_OPTIONS=--openssl-legacy-provider' } },
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: { version: 14 }, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 0, from: 'matrix' },
+        {
+          value: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
+          key: 'node',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: { version: 14 }, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 1, from: 'matrix' },
+        {
+          value: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
+          key: 'node',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 0, from: 'include' },
+        {
+          value: { version: 18, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
+          key: 'node',
+          index: 0,
+          from: 'include',
+        },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -273,9 +572,33 @@ describe('Additional edge cases', () => {
     }
 
     const expected = [
-      { os: 'ubuntu-latest', node: { version: 14 } },
-      { os: 'macos-latest', node: { version: 14 } },
-      { os: 'macos-latest', node: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' } },
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 0, from: 'matrix' },
+        { value: { version: 14 }, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'ubuntu-latest', key: 'os', index: 0, from: 'matrix', isExcluded: true },
+        {
+          value: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
+          key: 'node',
+          index: 1,
+          from: 'matrix',
+          isExcluded: true,
+        },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 1, from: 'matrix' },
+        { value: { version: 14 }, key: 'node', index: 0, from: 'matrix' },
+      ],
+      [
+        { value: 'macos-latest', key: 'os', index: 1, from: 'matrix' },
+        {
+          value: { version: 20, env: 'NODE_OPTIONS=--openssl-legacy-provider' },
+          key: 'node',
+          index: 1,
+          from: 'matrix',
+        },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
@@ -299,11 +622,47 @@ describe('Additional edge cases', () => {
     }
 
     const expected = [
-      { fruit: 'apple', animal: 'cat', color: 'pink', shape: 'circle' },
-      { fruit: 'pear', animal: 'cat', color: 'pink' },
-      { fruit: 'pear', animal: 'dog', color: 'green' },
-      { fruit: 'banana' },
-      { fruit: 'banana', animal: 'cat' },
+      [
+        { value: 'apple', key: 'fruit', index: 0, from: 'matrix' },
+        { value: 'cat', key: 'animal', index: 0, from: 'matrix' },
+        { value: 'green', key: 'color', index: 0, from: 'include' },
+        { value: 'pink', key: 'color', index: 1, from: 'include' },
+        { value: 'circle', key: 'shape', index: 2, from: 'include' },
+      ],
+      [
+        {
+          value: 'apple',
+          key: 'fruit',
+          index: 0,
+          from: 'matrix',
+          isExcluded: true,
+        },
+        {
+          value: 'dog',
+          key: 'animal',
+          index: 1,
+          from: 'matrix',
+          isExcluded: true,
+        },
+        { value: 'green', key: 'color', index: 0, from: 'include' },
+        { value: 'circle', key: 'shape', index: 2, from: 'include' },
+      ],
+      [
+        { value: 'pear', key: 'fruit', index: 1, from: 'matrix' },
+        { value: 'cat', key: 'animal', index: 0, from: 'matrix' },
+        { value: 'green', key: 'color', index: 0, from: 'include' },
+        { value: 'pink', key: 'color', index: 1, from: 'include' },
+      ],
+      [
+        { value: 'pear', key: 'fruit', index: 1, from: 'matrix' },
+        { value: 'dog', key: 'animal', index: 1, from: 'matrix' },
+        { value: 'green', key: 'color', index: 0, from: 'include' },
+      ],
+      [{ value: 'banana', key: 'fruit', index: 3, from: 'include' }],
+      [
+        { value: 'banana', key: 'fruit', index: 4, from: 'include' },
+        { value: 'cat', key: 'animal', index: 4, from: 'include' },
+      ],
     ]
 
     const result = interpretMatrix(matrix)
