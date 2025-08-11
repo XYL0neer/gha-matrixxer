@@ -1,4 +1,9 @@
-import { type Matrix, type MatrixDefinition, type MatrixEntry } from '@/types/matrix'
+import {
+  type ContextfulMatrixValue,
+  type Matrix,
+  type MatrixDefinition,
+  type MatrixEntry,
+} from '@/types/matrix'
 import isEqual from 'lodash-es/isEqual'
 
 export function interpretMatrix(m: Matrix) {
@@ -6,9 +11,8 @@ export function interpretMatrix(m: Matrix) {
   const result = []
 
   for (const v of newGenMatrix(m.matrix)) {
-    if (exclusions !== undefined && matchExclusion(v, exclusions)) {
-      console.debug('Exclude entry', v)
-      continue
+    if (exclusions !== undefined) {
+      matchExclusion(v, exclusions)
     }
 
     console.debug('Add entry', v)
@@ -22,10 +26,14 @@ export function interpretMatrix(m: Matrix) {
   return result
 }
 
-function addInclusions(inclusions: MatrixEntry[], result: MatrixEntry[], matrix: MatrixDefinition) {
+function addInclusions(
+  inclusions: MatrixEntry[],
+  result: ContextfulMatrixValue[][],
+  matrix: MatrixDefinition,
+) {
   const newEntries = []
   const matrixIsEmpty = Object.keys(matrix).length === 0
-  for (const include of inclusions) {
+  for (const [includeIndex, include] of inclusions.entries()) {
     console.debug('Handle inclusion', include)
     const hasNewValueForExistingMatrixKey =
       matrixIsEmpty ||
@@ -38,22 +46,52 @@ function addInclusions(inclusions: MatrixEntry[], result: MatrixEntry[], matrix:
 
     if (hasNewValueForExistingMatrixKey) {
       console.debug('Add as new Entry', include)
-      newEntries.push(include)
-      console.debug('Add only on matching entries', include)
+      newEntries.push(
+        Object.entries(include).map(
+          ([key, value]) =>
+            ({ value, key, index: includeIndex, from: 'include' }) satisfies ContextfulMatrixValue,
+        ),
+      )
     } else if (hasExtendableMatrixKeyValue) {
+      console.debug('Add only on matching entries', include)
       result.forEach((value) => {
         const matchedKey = Object.entries(include).every(
-          ([key, v]) => !matrix.hasOwnProperty(key) || isEqual(value[key], v),
+          ([key, v]) =>
+            !matrix.hasOwnProperty(key) || value.some((e) => e.key === key && isEqual(e.value, v)),
         )
         if (matchedKey) {
           console.debug('Add to object', value)
-          Object.assign(value, include)
+          value.push(
+            ...Object.entries(include)
+              .filter(([key]) => !Object.keys(matrix).includes(key))
+              .map(
+                ([key, value]) =>
+                  ({
+                    value,
+                    key,
+                    index: includeIndex,
+                    from: 'include',
+                  }) satisfies ContextfulMatrixValue,
+              ),
+          )
         }
       })
     } else {
       console.debug('Add to all original entries', include)
       result.forEach((value) => {
-        extendObject(value, include)
+        value.push(
+          ...Object.entries(include)
+            .filter(([key]) => !Object.keys(matrix).includes(key))
+            .map(
+              ([key, value]) =>
+                ({
+                  value,
+                  key,
+                  index: includeIndex,
+                  from: 'include',
+                }) satisfies ContextfulMatrixValue,
+            ),
+        )
       })
     }
   }
@@ -61,20 +99,20 @@ function addInclusions(inclusions: MatrixEntry[], result: MatrixEntry[], matrix:
   result.push(...newEntries)
 }
 
-function extendObject(obj1: MatrixEntry, obj2: MatrixEntry) {
-  Object.keys(obj2).forEach((currentKey) => {
-    if (!obj1[currentKey]) {
-      obj1[currentKey] = obj2[currentKey]
-    }
-  })
-}
-
-function matchExclusion(v: MatrixEntry, exclusions: MatrixEntry[]) {
+function matchExclusion(v: ContextfulMatrixValue[], exclusions: MatrixEntry[]) {
   for (const exclude of exclusions) {
-    const matches = Object.entries(exclude).every(([key, value]) => isEqual(v[key], value))
-    if (matches) return true
+    const hasExclusion = Object.entries(exclude).every(([key, value]) =>
+      isEqual(v.find((e) => e.key === key)?.value, value),
+    )
+
+    if (hasExclusion) {
+      v.forEach((e) => {
+        if (Object.keys(exclude).includes(e.key)) {
+          e.isExcluded = true
+        }
+      })
+    }
   }
-  return false
 }
 
 function* newGenMatrix(m: MatrixDefinition) {
@@ -104,11 +142,11 @@ function* newGenMatrix(m: MatrixDefinition) {
     let iterCount = 0
 
     while (iterCount < iterations) {
-      const o: MatrixEntry = {}
+      const o: ContextfulMatrixValue[] = []
       for (let j = 0; j < indexes.length; j++) {
         const key = keys[j]
         const value = m[key][indexes[j]]
-        o[key] = value
+        o.push({ value, key, index: indexes[j], from: 'matrix' })
       }
       increaseIndex()
       iterCount++
