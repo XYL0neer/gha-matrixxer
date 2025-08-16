@@ -10,23 +10,13 @@ import { Codemirror } from 'vue-codemirror'
 import { yamlLanguage } from '@codemirror/lang-yaml'
 import { linter, type Diagnostic } from '@codemirror/lint'
 import { oneDark } from '@codemirror/theme-one-dark'
+import { EditorView } from '@codemirror/view'
+import { ref } from 'vue'
 
 const lintYaml = linter((view) => {
   const diagnostics: Diagnostic[] = []
   try {
-    const text = view.state.doc.toString()
-    const yaml = load(text)
-    const { strategy } = strategySchema.parse(yaml)
-    if (Array.isArray(strategy.matrix)) {
-      const matrixStart = text.indexOf('matrix')
-      diagnostics.push({
-        from: matrixStart,
-        to: matrixStart + 6,
-        message:
-          'Defined a list in matrix which is not a valid matrix definition. Consider to put the list under `strategy.matrix.include`',
-        severity: 'warning',
-      })
-    }
+    load(view.state.doc.toString())
   } catch (error) {
     if (error instanceof YAMLException) {
       console.log(error)
@@ -39,6 +29,8 @@ const lintYaml = linter((view) => {
   }
   return diagnostics
 })
+
+const view = ref<EditorView>()
 
 const extensions = [yamlLanguage.extension, lintYaml, oneDark]
 const initialRawMatrix = `
@@ -61,11 +53,7 @@ const strategySchema = z.object({
 
 const formSchema = z.string().refine((val) => {
   try {
-    const yaml = load(val)
-    const { strategy } = strategySchema.parse(yaml)
-    if (Array.isArray(strategy.matrix)) {
-      return false
-    }
+    load(val)
     return true
   } catch (error) {
     console.log(error)
@@ -98,7 +86,7 @@ const onSubmit = () => {
 
 <template>
   <form @submit.prevent="onSubmit">
-    <codemirror v-model="matrixInput" :extensions="extensions" />
+    <codemirror v-model="matrixInput" :extensions="extensions" @ready="(p) => (view = p.view)" />
     <Button class="mt-4" type="submit" :disabled="errorMessage !== undefined"
       >Generate Matrix</Button
     >
