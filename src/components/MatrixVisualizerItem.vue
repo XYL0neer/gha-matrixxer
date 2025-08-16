@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Badge, type BadgeVariants } from '@/components/ui/badge'
-import type { MatrixResult } from '@/types/matrix'
+import type { MatrixResult, MatrixValue } from '@/types/matrix'
 import { computed, defineProps, useId } from 'vue'
 import MatrixVisualizerItemRow from './MatrixVisualizerItemRow.vue'
 
@@ -18,6 +18,12 @@ const resultBadgeProps = computed((): { label: string; variant: BadgeVariants['v
 
   return { label: 'Matrix', variant: 'default' }
 })
+
+const resultingValues = computed(() => {
+  const ret: Record<string, MatrixValue> = {}
+  result.entries.forEach((e) => (ret[e.key] = e.value))
+  return ret
+})
 </script>
 
 <template>
@@ -29,7 +35,12 @@ const resultBadgeProps = computed((): { label: string; variant: BadgeVariants['v
         </p>
       </CardHeader>
       <CardContent>
-        <MatrixVisualizerItemRow v-for="e of result.entries" :entry="e" :key="`${id}-${e.key}`" />
+        <MatrixVisualizerItemRow
+          v-for="[key, value] of Object.entries(resultingValues)"
+          :property="key"
+          :value="value"
+          :key="`${id}-${key}`"
+        />
       </CardContent>
     </Card>
   </li>
