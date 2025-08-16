@@ -12,6 +12,10 @@ export type MatrixDefinition = {
 export type MatrixValue = string | number | object
 
 export type MatrixEntry = Record<string, MatrixValue>
+export type MatrixResult = {
+  entries: ContextfulMatrixValue[]
+  exclusionIndex?: number
+}
 export type ContextfulMatrixValue = {
   value: string | number | object
   from: 'matrix' | 'include'
