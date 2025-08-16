@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ContextfulMatrixValue } from '@/types/matrix'
+import type { MatrixValue } from '@/types/matrix'
 
-const { entry } = defineProps<{ entry: ContextfulMatrixValue }>()
+const { property, value } = defineProps<{ property: string; value: MatrixValue }>()
 </script>
 <template>
   <p>
-    <span class="text-zinc font-bold">{{ entry.key }}: </span>
-    <span>{{ JSON.stringify(entry.value) }}</span>
+    <span class="text-zinc font-bold">{{ property }}: </span>
+    <span>{{ JSON.stringify(value) }}</span>
   </p>
 </template>
